@@ -199,7 +199,7 @@ class StatusBarAnimator {
 
         // Compute midY: the Y where the main icon starts, centring the full
         // element (icon + optional progress line below) in the button
-        let iconHeight: CGFloat = state == .playing ? 9 : 10  // bars vs pause/stop
+        let iconHeight: CGFloat = state == .stopped ? 10 : 9  // stop square vs bars
         let progressExtra = showProgress ? progressLineGap + progressLineHeight : 0
         let totalElementHeight = iconHeight + progressExtra
         let midY = (height - totalElementHeight) / 2 + progressExtra
@@ -209,20 +209,18 @@ class StatusBarAnimator {
         // Pre-compute bar heights for playing state
         let capturedAnimationsEnabled = animationsEnabled
         var currentHeights = [CGFloat]()
-        if state == .playing {
-            if capturedAnimationsEnabled {
-                let now = CACurrentMediaTime()
-                let capturedBarStartTime = barStartTime
-                for i in 0..<barHeights.count {
-                    let period = barDurations[i] * 2
-                    let phase = ((now - capturedBarStartTime + Double(i)) / period)
-                        .truncatingRemainder(dividingBy: 1.0)
-                    let t = phase < 0.5 ? phase * 2 : (1 - phase) * 2
-                    currentHeights.append(CGFloat(2 + (barHeights[i] - 2) * t))
-                }
-            } else {
-                currentHeights = barHeights.map { CGFloat($0) }
+        if state == .playing && capturedAnimationsEnabled {
+            let now = CACurrentMediaTime()
+            let capturedBarStartTime = barStartTime
+            for i in 0..<barHeights.count {
+                let period = barDurations[i] * 2
+                let phase = ((now - capturedBarStartTime + Double(i)) / period)
+                    .truncatingRemainder(dividingBy: 1.0)
+                let t = phase < 0.5 ? phase * 2 : (1 - phase) * 2
+                currentHeights.append(CGFloat(2 + (barHeights[i] - 2) * t))
             }
+        } else if state == .playing || state == .paused {
+            currentHeights = barHeights.map { CGFloat($0) }
         }
 
         // Capture text rendering values
@@ -255,13 +253,7 @@ class StatusBarAnimator {
                 NSBezierPath(roundedRect: NSRect(x: padding + 2, y: midY, width: 10, height: 10),
                              xRadius: 2, yRadius: 2).fill()
 
-            case .paused:
-                for i in 0..<2 {
-                    NSBezierPath(roundedRect: NSRect(x: padding + CGFloat(i) * 8, y: midY, width: 6, height: 10),
-                                 xRadius: 2, yRadius: 2).fill()
-                }
-
-            case .playing:
+            case .playing, .paused:
                 for i in 0..<currentHeights.count {
                     NSBezierPath(roundedRect: NSRect(x: padding + CGFloat(i) * 3.5, y: midY, width: 2, height: currentHeights[i]),
                                  xRadius: 1, yRadius: 1).fill()
