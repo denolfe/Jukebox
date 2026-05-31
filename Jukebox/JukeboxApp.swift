@@ -258,7 +258,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWind
         guard let trackArtist = notification.userInfo?["artist"] as? String else { return }
         guard let isPlaying = notification.userInfo?["isPlaying"] as? Bool else { return }
         let playbackStateString = notification.userInfo?["playbackState"] as? String ?? "stopped"
-        let titleAndArtist = trackTitle.isEmpty && trackArtist.isEmpty ? "" : "\(trackTitle) • \(trackArtist)"
+        let titleAndArtist = trackTitle.isEmpty && trackArtist.isEmpty ? "" : "\(trackArtist) • \(trackTitle)"
 
         // Update playback state animation
         let playbackState: PlaybackState
