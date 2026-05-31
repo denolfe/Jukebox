@@ -1,6 +1,7 @@
 
 Jukebox/Secrets.plist
 *.DS_Store
+xcuserdata/
 docs/plans/
 TODO.md
 Jukebox-*.zip
